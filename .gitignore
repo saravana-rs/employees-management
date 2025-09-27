@@ -1,2 +1,4 @@
 # Ignore vendor folder
 vendor/
+og-files/
+test.php
