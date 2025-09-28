@@ -7,14 +7,13 @@ require_once 'vendor/autoload.php';
 use Dompdf\Dompdf;
 use Dompdf\Options;
 
-// Get employee ID
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
 if ($id <= 0) {
     die('Invalid employee ID');
 }
 
-// Fetch employee data
+
 $sql = "SELECT * FROM employees WHERE id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $id);
@@ -27,7 +26,6 @@ if ($result->num_rows == 0) {
 
 $employee = $result->fetch_assoc();
 
-// Prepare logo for PDF
 $logoHtml = '';
 if (!empty($employee['logo'])) {
     $logoPath = __DIR__ . '/uploads/' . $employee['logo'];
@@ -38,8 +36,6 @@ if (!empty($employee['logo'])) {
     }
 }
 
-// Create HTML content for PDF
-// Create HTML content for PDF
 $html = '
 <!DOCTYPE html>
 <html>

@@ -97,7 +97,6 @@
     </style>
 </head>
 <body>
-    <!-- Loading Overlay -->
     <div class="loading-overlay" id="loadingOverlay">
         <div class="spinner-border text-light" role="status">
             <span class="visually-hidden">Loading...</span>
@@ -128,7 +127,7 @@
                             </tr>
                         </thead>
                         <tbody id="employeeTableBody">
-                            <!-- Data will be loaded here -->
+                            <!-- data will be loaded here -->
                         </tbody>
                     </table>
                 </div>
@@ -136,7 +135,7 @@
         </div>
     </div>
 
-    <!-- Add/Edit Employee Modal -->
+    <!-- add/edit employee modal -->
     <div class="modal fade" id="employeeModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -184,14 +183,10 @@
             </div>
         </div>
     </div>
-
- 
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
-    
-    
+</body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
 <script>
 let currentEmployeeId = null;
 let isEditMode = false;
@@ -208,7 +203,7 @@ function setupValidation() {
 
     console.log("isEditMode",isEditMode);
     console.log("currentEmployeeId",currentEmployeeId);
-    // Custom method for file size validation
+    // custom method for file size validation
     $.validator.addMethod("filesize", function(value, element, param) {
         if (!element.files.length) return true; // no file selected
         return element.files[0].size <= param;
@@ -228,20 +223,17 @@ function setupValidation() {
             employeeLogo: {
                 required: function() {
                     if (!isEditMode) {
-                        // Add new employee → always required
+                        // add new employee → always required
                         $.validator.messages.employeeLogo = "Employee logo is required when adding.";
                         return true;
                     }
-
-                    // Edit employee
+                    // edit employee
                     const existingLogo = $('#existingLogo').val();
                     const imageRemoved = $('#image_removed').val();
-
                     if ((!existingLogo && !$('#employeeLogo').val()) || (imageRemoved == '1' && !$('#employeeLogo').val())) {
                         $.validator.messages.employeeLogo = "Please upload a new logo (existing one removed).";
                         return true;
                     }
-
                     return false; // keep existing logo → ok
                 },
                 filesize: 5242880 // 5MB
@@ -314,6 +306,7 @@ function openAddModal() {
 }
 
 function openEditModal(id) {
+    console.log("openEditModal",id);
     isEditMode = true;
     currentEmployeeId = id;
     $('#modalTitle').text('Edit Employee');
@@ -322,6 +315,7 @@ function openEditModal(id) {
     $.getJSON('get_employee.php', {id}, function(res){
         hideLoading();
         if(res.success){
+            console.log("name",res.data.name);
             $('#employeeId').val(res.data.id);
             $('#employeeName').val(res.data.name);
             $('#employeeEmail').val(res.data.email);
@@ -336,17 +330,17 @@ function openEditModal(id) {
 $(".btn.btn-secondary").on("click", function() {
     let form = $("#employeeForm");
 
-    // Reset errors
+    // reset errors
     form.validate().resetForm();
     form.find('.error').removeClass('error');
     $("#nameError, #emailError, #logoError").html('');
 
-    // Reset image remove flag
+    // reset image remove flag
     $('#image_removed').val('0');
 });
 function saveEmployee() {
     if(!$('#employeeForm').valid()) return;
-
+    console.log("checking save");
     const formData = new FormData();
     formData.append('id', $('#employeeId').val());
     formData.append('name', $('#employeeName').val());
@@ -366,20 +360,20 @@ function saveEmployee() {
         dataType: 'json',
         success: function(response) {
              hideLoading();
-             $('.error').html(''); // Clear previous errors
+             $('.error').html(''); // clear previous errors
              
              if (response.success) {
                  $('#employeeModal').modal('hide');
                  showAlert('success', response.message);
                  loadEmployees();
              } else {
-                 // Field-specific error handling
+                 // field-specific error handling
                  if (response.field === 'email') {
                      $('#emailError').html(response.message);
                  } else if (response.field === 'name') {
                      $('#nameError').html(response.message);
                  } else {
-                     // General alert
+                     // general alert
                      showAlert('danger', response.message);
                  }
              }
@@ -401,6 +395,7 @@ function deleteEmployee(id){
 
 function previewEmployee(id){
     currentEmployeeId = id;
+    console.log("currentEmployeeId",currentEmployeeId);
     // showLoading();
     // $.getJSON('get_employee.php',{id}, function(res){
     //     hideLoading();
@@ -415,33 +410,59 @@ downloadPDF()
 }
 
 function downloadPDF(){ 
-    if(currentEmployeeId){ showLoading(); window.location.href='generate_pdf.php?id='+currentEmployeeId;
-         setTimeout(hideLoading,700); } 
-        
-        
+    
+    if(currentEmployeeId){ 
+        showLoading(); 
+        window.location.href='generate_pdf.php?id='+currentEmployeeId;
+        setTimeout(hideLoading,700); 
+    }     
 }
 
-function loadEmployees(){
+function loadEmployees() {
     showLoading();
-    $.getJSON('get_employees.php', function(res){
-        hideLoading();
-        let html = '';
-        if(res.success && res.data.length>0){
-            res.data.forEach(emp=>{
-                let logoHtml = emp.logo ? `<img src="uploads/${emp.logo}" class="employee-logo">` : '<i class="fas fa-user-circle fa-2x text-muted"></i>';
-                html+=`<tr>
-                    <td>${emp.id}</td><td>${emp.name}</td><td>${emp.email}</td><td>${logoHtml}</td>
-                    <td>
-                        <button class="btn btn-sm btn-warning" onclick="openEditModal(${emp.id})"><i class="fas fa-edit"></i> Edit</button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteEmployee(${emp.id})"><i class="fas fa-trash"></i> Delete</button>
-                        <button class="btn btn-sm btn-info" onclick="previewEmployee(${emp.id})"><i class="fas fa-eye"></i> Preview</button>
-                    </td>
-                </tr>`;
-            });
-        } else html='<tr><td colspan="5" class="text-center">No employees found</td></tr>';
-        $('#employeeTableBody').html(html);
-    }).fail(()=>{ hideLoading(); showAlert('danger','Error loading employees'); });
+    $.ajax({
+        url: 'get_employees.php',   
+        type: 'GET',                
+        dataType: 'json',           
+        success: function(res) {
+            hideLoading();
+            let html = '';
+            if (res.success && res.data.length > 0) {
+                res.data.forEach(emp => {
+                    let logoHtml = emp.logo 
+                        ? `<img src="uploads/${emp.logo}" class="employee-logo">` 
+                        : '<i class="fas fa-user-circle fa-2x text-muted"></i>';
+
+                    html += `<tr>
+                        <td>${emp.id}</td>
+                        <td>${emp.name}</td>
+                        <td>${emp.email}</td>
+                        <td>${logoHtml}</td>
+                        <td>
+                            <button class="btn btn-sm btn-warning" onclick="openEditModal(${emp.id})">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteEmployee(${emp.id})">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                            <button class="btn btn-sm btn-info" onclick="previewEmployee(${emp.id})">
+                                <i class="fas fa-eye"></i> Preview
+                            </button>
+                        </td>
+                    </tr>`;
+                });
+            } else {
+                html = '<tr><td colspan="5" class="text-center">No employees found</td></tr>';
+            }
+            $('#employeeTableBody').html(html);
+        },
+        error: function() {
+            hideLoading();
+            showAlert('danger', 'Error loading employees');
+        }
+    });
 }
+
 
 function showAlert(type,message){
     $('#alertContainer').html(`<div class="alert alert-${type} alert-dismissible fade show" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`);
@@ -453,5 +474,5 @@ function hideLoading(){ $('#loadingOverlay').removeClass('show'); }
 </script>
 
 
-</body>
+
 </html>

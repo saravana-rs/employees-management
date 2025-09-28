@@ -1,22 +1,18 @@
 <?php
-// Database configuration
+// database connect
 $host = 'localhost';
 $username = 'root';
 $password = '';
 $database = 'employee_management';
 
-// Create connection
 $conn = new mysqli($host, $username, $password, $database);
 
-// Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
-
-// Set charset to UTF-8
 $conn->set_charset("utf8mb4");
 
-// Create uploads directory if it doesn't exist
+// common folder  uploads
 $upload_dir = 'uploads/';
 if (!file_exists($upload_dir)) {
     mkdir($upload_dir, 0777, true);
@@ -24,7 +20,7 @@ if (!file_exists($upload_dir)) {
 
 
 
-
+// testing purpose
 function logEmailError($email, $employeeId, $name, $error = '') {
     $logDir = 'logs';
     if (!is_dir($logDir)) {

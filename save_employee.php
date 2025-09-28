@@ -52,7 +52,7 @@ try {
          unlink($upload_dir . $image_removed);
     }
 
-    // Handle logo upload
+    // handle logo upload
     $logoFileName = $existingLogo; // default
     if (isset($_FILES['logo']) && $_FILES['logo']['error'] === 0) {
         $allowedTypes = ['image/jpeg','image/png','image/gif','image/jpg'];
@@ -61,11 +61,11 @@ try {
         if (!in_array($_FILES['logo']['type'], $allowedTypes)) throw new Exception('Invalid file type');
         if ($_FILES['logo']['size'] > $maxSize) throw new Exception('File too large');
 
-        // Use original filename
+        // use original filename
         $logoFileName = basename($_FILES['logo']['name']);
         $uploadPath = $upload_dir . $logoFileName;
 
-        // If filename exists, make unique
+        // if filename exists, make unique
         if (file_exists($uploadPath)) {
             $logoFileName = $logoFileName = $_FILES['logo']['name']; // original file name
 
@@ -77,11 +77,6 @@ try {
         }
     }
 
-
-
-   
-
-    // Save to DB
     if ($id > 0) {
         $stmt = $conn->prepare("UPDATE employees SET name=?, email=?, logo=? WHERE id=?");
         $stmt->bind_param("sssi", $name, $email, $logoFileName, $id);
@@ -95,8 +90,7 @@ try {
     if ($stmt->execute()) {
         $employeeId = $isUpdate ? $id : $conn->insert_id;
 
-        // Send email for new employees
-        // Check if new employee
+        // send email ...
         if (!$isUpdate) {
             $emailSent = sendWelcomeEmail($email, $name, $logoFileName);
             if ($emailSent) {
