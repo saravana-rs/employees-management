@@ -6,95 +6,7 @@
     <title>Employee Management System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .container-main {
-            padding: 30px 0;
-        }
-        .card {
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            border: none;
-        }
-        .card-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 15px 15px 0 0 !important;
-            padding: 20px;
-        }
-        .btn-add {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            color: white;
-            padding: 10px 30px;
-            border-radius: 25px;
-            transition: all 0.3s;
-        }
-        .btn-add:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            color: white;
-        }
-        .employee-logo {
-            width: 100px;
-            height: 50px;
-            object-fit: cover;
-            border: 2px solid #667eea;
-        }
-        .modal-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        .error {
-            color: red;
-            font-size: 12px;
-            margin-top: 5px;
-        }
-        .preview-container {
-            text-align: center;
-            margin: 10px 0;
-        }
-        .preview-image {
-            max-width: 200px;
-            max-height: 200px;
-            border-radius: 10px;
-            margin-top: 10px;
-        }
-        .remove-image-btn {
-            margin-top: 10px;
-        }
-        .loading-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-        }
-        .loading-overlay.show {
-            display: flex;
-        }
-        .spinner-border {
-            width: 3rem;
-            height: 3rem;
-        }
-        .table-responsive {
-            border-radius: 10px;
-            overflow: hidden;
-        }
-        .alert {
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css?v=1.0">
 </head>
 <body>
     <div class="loading-overlay" id="loadingOverlay">
@@ -127,7 +39,6 @@
                             </tr>
                         </thead>
                         <tbody id="employeeTableBody">
-                            <!-- data will be loaded here -->
                         </tbody>
                     </table>
                 </div>
@@ -135,7 +46,6 @@
         </div>
     </div>
 
-    <!-- add/edit employee modal -->
     <div class="modal fade" id="employeeModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -223,7 +133,7 @@ function setupValidation() {
             employeeLogo: {
                 required: function() {
                     if (!isEditMode) {
-                        // add new employee → always required
+                      
                         $.validator.messages.employeeLogo = "Employee logo is required when adding.";
                         return true;
                     }
@@ -234,7 +144,7 @@ function setupValidation() {
                         $.validator.messages.employeeLogo = "Please upload a new logo (existing one removed).";
                         return true;
                     }
-                    return false; // keep existing logo → ok
+                    return false; 
                 },
                 filesize: 5242880 // 5MB
             }
@@ -320,7 +230,7 @@ function openEditModal(id) {
             $('#employeeName').val(res.data.name);
             $('#employeeEmail').val(res.data.email);
             $('#existingLogo').val(res.data.logo);
-            if(res.data.logo){ $('#imagePreview').attr('src','uploads/'+res.data.logo); $('#previewContainer').show(); }
+            if(res.data.logo){ $('#imagePreview').attr('src','uploads/employee_'+res.data.id+'/'+res.data.logo); $('#previewContainer').show(); }
             else { $('#previewContainer').hide(); }
             $('#employeeModal').modal('show');
         } else { showAlert('danger', res.message); }
@@ -430,8 +340,9 @@ function loadEmployees() {
             if (res.success && res.data.length > 0) {
                 res.data.forEach(emp => {
                     let logoHtml = emp.logo 
-                        ? `<img src="uploads/${emp.logo}" class="employee-logo">` 
-                        : '<i class="fas fa-user-circle fa-2x text-muted"></i>';
+                      ? `<img src="uploads/employee_${emp.id}/${emp.logo}" class="employee-logo">` 
+                      : '<i class="fas fa-user-circle fa-2x text-muted"></i>';
+
 
                     html += `<tr>
                         <td>${emp.id}</td>

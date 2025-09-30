@@ -12,7 +12,7 @@ try {
         throw new Exception('Invalid employee ID');
     }
     
-    // first, get the employee's logo to delete the file
+    // get the employee's logo
     $sql = "SELECT logo FROM employees WHERE id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $id);
@@ -21,12 +21,20 @@ try {
     
     if ($result->num_rows > 0) {
         $employee = $result->fetch_assoc();
-        
-        // delete the logo file if exists
-        if (!empty($employee['logo']) && file_exists($upload_dir . $employee['logo'])) {
-            unlink($upload_dir . $employee['logo']);
+
+        // employee folder
+        $employeeDir = "uploads/employee_$id/";
+
+        // delete logo file if exists
+        if (!empty($employee['logo']) && file_exists($employeeDir . $employee['logo'])) {
+            unlink($employeeDir . $employee['logo']);
         }
-        
+
+        // optionally delete folder if empty
+        if (is_dir($employeeDir) && count(scandir($employeeDir)) == 2) {
+            rmdir($employeeDir);
+        }
+
         // delete the employee record
         $deleteSql = "DELETE FROM employees WHERE id = ?";
         $deleteStmt = $conn->prepare($deleteSql);

@@ -28,7 +28,7 @@ $employee = $result->fetch_assoc();
 
 $logoHtml = '';
 if (!empty($employee['logo'])) {
-    $logoPath = __DIR__ . '/uploads/' . $employee['logo'];
+      $logoPath = __DIR__ . '/uploads/employee_' . $employee['id'] . '/' . $employee['logo'];
     if (file_exists($logoPath)) {
         $imageData = base64_encode(file_get_contents($logoPath));
         $imageType = pathinfo($logoPath, PATHINFO_EXTENSION);
